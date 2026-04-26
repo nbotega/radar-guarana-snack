@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radar Guaraná Copa — Snack</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde-guarana: #006B3F;
+    --amarelo-brasil: #FFCB05;
+    --vermelho-fruto: #E73C2F;
+    --azul-memoria: #002D5F;
+    --neutro-900: #0A0E14;
+    --neutro-800: #1A1F26;
+    --neutro-700: #2C3138;
+    --neutro-500: #6B7280;
+    --neutro-300: #D1D5DB;
+    --neutro-100: #F3F4F6;
+    --neutro-50: #FAFAFA;
+    --branco: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { font-family: 'Inter', -apple-system, sans-serif; color: var(--neutro-900); background: var(--neutro-50); }
+  body { min-height: 100vh; padding-bottom: 80px; }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--neutro-900);
+    color: var(--branco);
+    padding: 20px 24px;
+    border-bottom: 4px solid var(--verde-guarana);
+  }
+  .header-inner { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-logo {
+    width: 36px; height: 36px;
+    background: var(--amarelo-brasil);
+    color: var(--neutro-900);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 18px;
+  }
+  .brand-text h1 { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .brand-text p { font-size: 12px; color: var(--neutro-300); margin-top: 2px; }
+  .header-meta { font-size: 12px; color: var(--neutro-300); }
+  .header-meta strong { color: var(--amarelo-brasil); }
+
+  /* ===== TABS ===== */
+  .tabs {
+    background: var(--branco);
+    border-bottom: 1px solid var(--neutro-300);
+    padding: 0 24px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .tabs-inner { max-width: 1400px; margin: 0 auto; display: flex; gap: 0; }
+  .tab {
+    padding: 16px 20px;
+    font-size: 14px; font-weight: 600;
+    color: var(--neutro-500);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.15s;
+    background: none; border-top: none; border-left: none; border-right: none;
+    font-family: inherit;
+  }
+  .tab:hover { color: var(--neutro-900); }
+  .tab.active { color: var(--verde-guarana); border-bottom-color: var(--verde-guarana); }
+
+  /* ===== CONTAINER ===== */
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+  /* ===== FILTROS ===== */
+  .filters {
+    background: var(--branco);
+    border: 1px solid var(--neutro-300);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 6px; min-width: 160px; }
+  .filter-group label { font-size: 11px; font-weight: 600; color: var(--neutro-500); text-transform: uppercase; letter-spacing: 0.04em; }
+  .filter-group select, .filter-group input {
+    padding: 8px 12px;
+    border: 1px solid var(--neutro-300);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 14px;
+    background: var(--branco);
+    color: var(--neutro-900);
+  }
+  .filter-group select:focus, .filter-group input:focus { outline: 2px solid var(--verde-guarana); outline-offset: -1px; border-color: var(--verde-guarana); }
+  .filter-clear {
+    padding: 8px 14px;
+    background: var(--neutro-100);
+    color: var(--neutro-700);
+    border: 1px solid var(--neutro-300);
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit; font-size: 13px; font-weight: 500;
+    align-self: flex-end;
+  }
+  .filter-clear:hover { background: var(--neutro-300); }
+
+  /* ===== STATS ===== */
+  .stats { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat { background: var(--branco); border: 1px solid var(--neutro-300); border-radius: 10px; padding: 12px 18px; min-width: 140px; flex: 1; }
+  .stat-label { font-size: 11px; font-weight: 600; color: var(--neutro-500); text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-value { font-size: 24px; font-weight: 700; margin-top: 4px; color: var(--neutro-900); }
+
+  /* ===== CARDS BRIEFINGS ===== */
+  .grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  @media (min-width: 768px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .card {
+    background: var(--branco);
+    border: 1px solid var(--neutro-300);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex; flex-direction: column; gap: 12px;
+    transition: all 0.15s;
+  }
+  .card:hover { border-color: var(--verde-guarana); box-shadow: 0 4px 16px rgba(0, 107, 63, 0.08); }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .card-creator { font-size: 13px; color: var(--neutro-500); font-weight: 500; }
+  .card-creator a { color: var(--neutro-700); text-decoration: none; }
+  .card-creator a:hover { color: var(--verde-guarana); text-decoration: underline; }
+  .card-score {
+    background: var(--neutro-900);
+    color: var(--branco);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .card-score.score-high { background: var(--verde-guarana); }
+  .card-score.score-mid { background: var(--neutro-700); }
+  .card-title { font-size: 16px; font-weight: 700; line-height: 1.35; color: var(--neutro-900); }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
+  .tag-territorio { background: rgba(0, 107, 63, 0.1); color: var(--verde-guarana); }
+  .tag-pilar { background: rgba(255, 203, 5, 0.18); color: #6B5300; }
+  .tag-lata { background: var(--azul-memoria); color: var(--branco); }
+
+  .card-justificativa { font-size: 13px; line-height: 1.55; color: var(--neutro-700); }
+  .card-actions { display: flex; gap: 8px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--neutro-100); }
+  .btn {
+    padding: 8px 12px;
+    font-size: 13px; font-weight: 600;
+    border-radius: 8px; border: none; cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .btn-primary { background: var(--neutro-900); color: var(--branco); flex: 1; }
+  .btn-primary:hover { background: var(--neutro-700); }
+  .btn-secondary { background: var(--neutro-100); color: var(--neutro-700); }
+  .btn-secondary:hover { background: var(--neutro-300); }
+
+  /* ===== STATUS BADGE ===== */
+  .status-badge {
+    display: inline-block;
+    padding: 2px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  .status-novo { background: var(--amarelo-brasil); color: var(--neutro-900); }
+  .status-em_avaliacao { background: var(--azul-memoria); color: var(--branco); }
+  .status-selecionado { background: var(--verde-guarana); color: var(--branco); }
+  .status-descartado { background: var(--neutro-300); color: var(--neutro-700); }
+  .status-executado { background: var(--vermelho-fruto); color: var(--branco); }
+
+  /* ===== MODAL DE DETALHES ===== */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10, 14, 20, 0.6);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--branco);
+    border-radius: 16px;
+    max-width: 720px; width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 16px; }
+  .modal-close { background: none; border: none; font-size: 28px; line-height: 1; cursor: pointer; color: var(--neutro-500); padding: 0; }
+  .modal-close:hover { color: var(--neutro-900); }
+  .modal-section { margin-bottom: 20px; }
+  .modal-section h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--neutro-500); margin-bottom: 8px; font-weight: 700; }
+  .modal-section p, .modal-section .text { font-size: 14px; line-height: 1.6; color: var(--neutro-700); }
+
+  .ideia {
+    background: var(--neutro-50);
+    border-left: 3px solid var(--verde-guarana);
+    padding: 14px 16px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+  .ideia.no-lata { border-left-color: var(--neutro-300); }
+  .ideia-titulo { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .ideia-desc { font-size: 13px; line-height: 1.55; color: var(--neutro-700); }
+  .ideia-meta { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .ideia-meta span { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 600; text-transform: uppercase; }
+  .meta-lata { background: var(--azul-memoria); color: var(--branco); }
+  .meta-no-lata { background: var(--neutro-300); color: var(--neutro-700); }
+  .meta-risco-baixo { background: rgba(0, 107, 63, 0.15); color: var(--verde-guarana); }
+  .meta-risco-medio { background: rgba(255, 203, 5, 0.25); color: #6B5300; }
+  .meta-risco-alto { background: rgba(231, 60, 47, 0.15); color: var(--vermelho-fruto); }
+
+  .alertas-list { list-style: none; padding: 0; }
+  .alertas-list li {
+    background: rgba(255, 203, 5, 0.12);
+    border-left: 3px solid var(--amarelo-brasil);
+    padding: 10px 14px;
+    border-radius: 4px;
+    font-size: 13px; line-height: 1.5;
+    margin-bottom: 6px;
+    color: var(--neutro-700);
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--neutro-500);
+  }
+  .empty h3 { font-size: 18px; color: var(--neutro-700); margin-bottom: 8px; }
+  .empty p { font-size: 14px; }
+
+  /* ===== LOADING ===== */
+  .loading {
+    text-align: center; padding: 60px 20px; color: var(--neutro-500); font-size: 14px;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--neutro-300);
+    border-top-color: var(--verde-guarana);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== ERROR ===== */
+  .error-banner {
+    background: rgba(231, 60, 47, 0.08);
+    border: 1px solid var(--vermelho-fruto);
+    color: var(--vermelho-fruto);
+    padding: 14px 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  /* ===== PRINT (PDF EXPORT) ===== */
+  @media print {
+    .header, .tabs, .filters, .stats, .card-actions, .modal-close { display: none !important; }
+    body { background: white; padding: 0; }
+    .modal-overlay { position: static; background: none; padding: 0; display: block !important; }
+    .modal { box-shadow: none; max-height: none; max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">S</div>
+      <div class="brand-text">
+        <h1>Radar Guaraná Copa</h1>
+        <p>Sede de Torcer é Coisa Nossa · Snack Content</p>
+      </div>
+    </div>
+    <div class="header-meta">
+      Última atualização: <strong id="last-update">--</strong>
+    </div>
+  </div>
+</header>
+
+<!-- ===== TABS ===== -->
+<nav class="tabs">
+  <div class="tabs-inner">
+    <button class="tab active" data-tab="briefings">Briefings</button>
+    <button class="tab" data-tab="creators">Creators</button>
+    <button class="tab" data-tab="trends">Trends</button>
+  </div>
+</nav>
+
+<!-- ===== CONTAINER ===== -->
+<main class="container">
+  <div id="error-container"></div>
+
+  <!-- ===== TAB: BRIEFINGS ===== -->
+  <section id="tab-briefings" class="tab-content">
+
+    <div class="filters">
+      <div class="filter-group">
+        <label>Território</label>
+        <select id="filter-territorio">
+          <option value="">Todos</option>
+          <option value="T1">T1 — Orgulho</option>
+          <option value="T2">T2 — Memória</option>
+          <option value="T3">T3 — Desejo</option>
+          <option value="T4">T4 — Resenha</option>
+          <option value="T5">T5 — Torcida</option>
+          <option value="T6">T6 — Brasilidade</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Pilar</label>
+        <select id="filter-pilar">
+          <option value="">Todos</option>
+          <option value="PILAR_1">PILAR 1 — Memória</option>
+          <option value="PILAR_2">PILAR 2 — Desejo</option>
+          <option value="PILAR_3">PILAR 3 — Resenha</option>
+          <option value="PILAR_4">PILAR 4 — Torcida</option>
+          <option value="PILAR_5">PILAR 5 — Brasilidade</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Lata Hero</label>
+        <select id="filter-lata">
+          <option value="">Todas</option>
+          <option value="1958">1958</option>
+          <option value="1962">1962</option>
+          <option value="1970">1970</option>
+          <option value="1994">1994</option>
+          <option value="2002">2002</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Status</label>
+        <select id="filter-status">
+          <option value="">Todos</option>
+          <option value="novo">Novo</option>
+          <option value="em_avaliacao">Em avaliação</option>
+          <option value="selecionado">Selecionado</option>
+          <option value="executado">Executado</option>
+          <option value="descartado">Descartado</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Score mínimo</label>
+        <input type="number" id="filter-score" min="0" max="100" placeholder="60" value="60">
+      </div>
+      <button class="filter-clear" id="btn-clear-filters">Limpar</button>
+    </div>
+
+    <div class="stats" id="stats-briefings"></div>
+    <div class="grid" id="briefings-grid"></div>
+
+  </section>
+
+  <!-- ===== TAB: CREATORS ===== -->
+  <section id="tab-creators" class="tab-content" style="display: none;">
+    <div class="filters">
+      <div class="filter-group">
+        <label>Afinidade média mínima</label>
+        <input type="number" id="filter-creators-score" min="0" max="100" value="60">
+      </div>
+      <div class="filter-group" style="min-width: 200px;">
+        <label>Mostrar blacklist?</label>
+        <select id="filter-creators-blacklist">
+          <option value="hide">Esconder</option>
+          <option value="show">Mostrar todos</option>
+          <option value="only">Só blacklist</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid" id="creators-grid"></div>
+  </section>
+
+  <!-- ===== TAB: TRENDS ===== -->
+  <section id="tab-trends" class="tab-content" style="display: none;">
+    <div class="filters">
+      <div class="filter-group">
+        <label>Mínimo de vídeos no cluster</label>
+        <input type="number" id="filter-trends-count" min="2" max="20" value="3">
+      </div>
+    </div>
+    <div class="grid" id="trends-grid"></div>
+  </section>
+
+</main>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modal">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+  // ===========================================================
+  // CONFIGURAÇÃO — preencher com as credenciais do Supabase
+  // No Vercel, configurar como Environment Variables
+  // ===========================================================
+  const SUPABASE_URL = window.SUPABASE_URL || 'https://fwoeruyvejkurhdufzxw.supabase.co';
+  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3b2VydXl2ZWprdXJoZHVmenh3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyMDE0MjgsImV4cCI6MjA5Mjc3NzQyOH0.rAvLHMoFysg3hPfC2CuubDg8qanipRV4IGIT2S43suk';
+
+  const TERRITORIO_LABELS = {
+    'T1': 'Orgulho', 'T2': 'Memória', 'T3': 'Desejo',
+    'T4': 'Resenha', 'T5': 'Torcida', 'T6': 'Brasilidade'
+  };
+  const PILAR_LABELS = {
+    'PILAR_1': 'Memória', 'PILAR_2': 'Desejo', 'PILAR_3': 'Resenha',
+    'PILAR_4': 'Torcida', 'PILAR_5': 'Brasilidade'
+  };
+  const STATUS_LABELS = {
+    'novo': 'Novo', 'em_avaliacao': 'Em avaliação',
+    'selecionado': 'Selecionado', 'descartado': 'Descartado', 'executado': 'Executado'
+  };
+
+  // ===========================================================
+  // FETCH HELPER
+  // ===========================================================
+  async function supabaseFetch(path) {
+    const url = `${SUPABASE_URL}/rest/v1/${path}`;
+    const r = await fetch(url, {
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (!r.ok) {
+      const text = await r.text();
+      throw new Error(`Supabase ${r.status}: ${text}`);
+    }
+    return r.json();
+  }
+
+  // ===========================================================
+  // STATE
+  // ===========================================================
+  let allBriefings = [];
+  let allCreators = [];
+
+  // ===========================================================
+  // RENDER BRIEFINGS
+  // ===========================================================
+  function renderBriefingCard(b) {
+    const territorios = (b.territorio_match || []).map(t =>
+      `<span class="tag tag-territorio">${t} · ${TERRITORIO_LABELS[t] || t}</span>`
+    ).join('');
+    const pilares = (b.pilar_match || []).map(p =>
+      `<span class="tag tag-pilar">${p.replace('_', ' ')}</span>`
+    ).join('');
+    const lata = b.lata_hero_sugerida
+      ? `<span class="tag tag-lata">Lata ${b.lata_hero_sugerida}</span>`
+      : '';
+    const scoreClass = b.score >= 85 ? 'score-high' : b.score >= 60 ? '' : 'score-mid';
+    const status = b.status || 'novo';
+
+    return `
+      <article class="card" data-id="${b.id}">
+        <div class="card-header">
+          <div>
+            <div class="card-creator">
+              <a href="${b.video_url}" target="_blank" rel="noopener">@${(b.creator_handle || '').replace('@', '')}</a>
+              · <span class="status-badge status-${status}">${STATUS_LABELS[status] || status}</span>
+            </div>
+          </div>
+          <div class="card-score ${scoreClass}">${b.score}</div>
+        </div>
+        <h3 class="card-title">${escapeHtml(b.titulo || 'Briefing')}</h3>
+        <div class="tags">${lata}${territorios}${pilares}</div>
+        <p class="card-justificativa">${escapeHtml(b.justificativa || '')}</p>
+        <div class="card-actions">
+          <button class="btn btn-primary" data-action="open" data-id="${b.id}">Ver ideias e alertas</button>
+        </div>
+      </article>
+    `;
+  }
+
+  function renderModal(b) {
+    const ideias = (b.ideias_ativacao || []).map(i => {
+      const riscoClass = `meta-risco-${i.nivel_risco || 'baixo'}`;
+      const lataLabel = i.usa_lata
+        ? '<span class="meta-lata">Com lata</span>'
+        : '<span class="meta-no-lata">Sem lata</span>';
+      const sl = i.justificativa_sem_lata
+        ? `<p class="ideia-desc" style="margin-top:6px;font-style:italic;">Por que não usa lata: ${escapeHtml(i.justificativa_sem_lata)}</p>`
+        : '';
+      return `
+        <div class="ideia ${i.usa_lata ? '' : 'no-lata'}">
+          <div class="ideia-titulo">${escapeHtml(i.titulo || '')}</div>
+          <div class="ideia-desc">${escapeHtml(i.descricao || '')}</div>
+          ${sl}
+          <div class="ideia-meta">
+            ${lataLabel}
+            <span class="${riscoClass}">Risco ${i.nivel_risco || 'baixo'}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    const alertas = (b.alertas || []).length
+      ? `<ul class="alertas-list">${b.alertas.map(a => `<li>${escapeHtml(a)}</li>`).join('')}</ul>`
+      : '<p class="text">Nenhum alerta.</p>';
+
+    return `
+      <div class="modal-header">
+        <div>
+          <div class="card-creator" style="margin-bottom:6px;">
+            <a href="${b.video_url}" target="_blank" rel="noopener">@${(b.creator_handle || '').replace('@', '')}</a>
+            · <span class="status-badge status-${b.status || 'novo'}">${STATUS_LABELS[b.status] || b.status}</span>
+          </div>
+          <h2 style="font-size:20px;font-weight:800;line-height:1.3;">${escapeHtml(b.titulo || '')}</h2>
+        </div>
+        <button class="modal-close" data-action="close">×</button>
+      </div>
+
+      <div class="modal-section">
+        <h3>Score · Território · Pilar · Lata</h3>
+        <div class="tags" style="margin-top:6px;">
+          <span class="card-score ${b.score >= 85 ? 'score-high' : ''}" style="display:inline-block;">${b.score}/100</span>
+          ${b.lata_hero_sugerida ? `<span class="tag tag-lata">Lata ${b.lata_hero_sugerida}</span>` : ''}
+          ${(b.territorio_match || []).map(t => `<span class="tag tag-territorio">${t} · ${TERRITORIO_LABELS[t]}</span>`).join('')}
+          ${(b.pilar_match || []).map(p => `<span class="tag tag-pilar">${p.replace('_', ' ')}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Justificativa do radar</h3>
+        <p>${escapeHtml(b.justificativa || '')}</p>
+      </div>
+
+      <div class="modal-section">
+        <h3>3 ideias de ativação</h3>
+        ${ideias || '<p class="text">Nenhuma ideia gerada.</p>'}
+      </div>
+
+      <div class="modal-section">
+        <h3>Alertas</h3>
+        ${alertas}
+      </div>
+
+      <div class="modal-section" style="display:flex;gap:8px;">
+        <button class="btn btn-primary" onclick="window.print()">Exportar como PDF</button>
+        <button class="btn btn-secondary" data-action="close">Fechar</button>
+      </div>
+    `;
+  }
+
+  // ===========================================================
+  // RENDER CREATORS
+  // ===========================================================
+  function renderCreatorCard(c) {
+    const territorios = (c.territorios || []).map(t =>
+      `<span class="tag tag-territorio">${t}</span>`
+    ).join('');
+    const pilares = (c.pilares || []).map(p =>
+      `<span class="tag tag-pilar">${p.replace('_', ' ')}</span>`
+    ).join('');
+    const blacklistTag = c.tem_blacklist_sugerida
+      ? `<span class="tag" style="background:var(--vermelho-fruto);color:white;">⚠ Blacklist sugerida</span>`
+      : '';
+
+    return `
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-creator">${escapeHtml(c.creator_handle || '')}</div>
+          </div>
+          <div class="card-score ${c.afinidade_media >= 85 ? 'score-high' : ''}">${c.afinidade_media}</div>
+        </div>
+        <h3 class="card-title">${c.total_videos} vídeo${c.total_videos > 1 ? 's' : ''} no radar</h3>
+        <div class="tags">${blacklistTag}${territorios}${pilares}</div>
+        <p class="card-justificativa">
+          Melhor score: <strong>${c.melhor_score}</strong> ·
+          Última aparição: <strong>${formatDate(c.ultima_aparicao)}</strong>
+        </p>
+      </article>
+    `;
+  }
+
+  // ===========================================================
+  // RENDER TRENDS
+  // ===========================================================
+  function renderTrendCard(t) {
+    return `
+      <article class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-creator">Cluster: ${escapeHtml(t.cluster_key || '')}</div>
+          </div>
+          <div class="card-score">${t.video_count} vídeos</div>
+        </div>
+        <h3 class="card-title">${escapeHtml(t.formato_narrativo || 'Trend sem nome')}</h3>
+        <p class="card-justificativa">
+          Score médio: <strong>${Math.round(t.score_medio || 0)}</strong> ·
+          Replicabilidade: <strong>${Math.round(t.replicavel_medio || 0)}</strong>
+        </p>
+      </article>
+    `;
+  }
+
+  // ===========================================================
+  // FILTROS
+  // ===========================================================
+  function applyBriefingFilters() {
+    const territorio = document.getElementById('filter-territorio').value;
+    const pilar = document.getElementById('filter-pilar').value;
+    const lata = document.getElementById('filter-lata').value;
+    const status = document.getElementById('filter-status').value;
+    const scoreMin = parseInt(document.getElementById('filter-score').value) || 0;
+
+    let filtered = allBriefings.filter(b => {
+      if (b.score < scoreMin) return false;
+      if (territorio && !(b.territorio_match || []).includes(territorio)) return false;
+      if (pilar && !(b.pilar_match || []).includes(pilar)) return false;
+      if (lata && b.lata_hero_sugerida !== lata) return false;
+      if (status && b.status !== status) return false;
+      return true;
+    });
+
+    document.getElementById('briefings-grid').innerHTML =
+      filtered.length === 0
+        ? '<div class="empty"><h3>Nenhum briefing encontrado</h3><p>Ajusta os filtros ou aguarda a próxima coleta do radar.</p></div>'
+        : filtered.map(renderBriefingCard).join('');
+
+    renderStats(filtered);
+  }
+
+  function renderStats(briefings) {
+    const total = briefings.length;
+    const high = briefings.filter(b => b.score >= 85).length;
+    const comLata = briefings.filter(b => (b.ideias_ativacao || []).some(i => i.usa_lata)).length;
+    const pctLata = total > 0 ? Math.round((comLata / total) * 100) : 0;
+    const novos = briefings.filter(b => b.status === 'novo').length;
+
+    document.getElementById('stats-briefings').innerHTML = `
+      <div class="stat"><div class="stat-label">Total</div><div class="stat-value">${total}</div></div>
+      <div class="stat"><div class="stat-label">Score ≥ 85</div><div class="stat-value">${high}</div></div>
+      <div class="stat"><div class="stat-label">Com lata em cena</div><div class="stat-value">${pctLata}%</div></div>
+      <div class="stat"><div class="stat-label">Novos pra revisar</div><div class="stat-value">${novos}</div></div>
+    `;
+  }
+
+  // ===========================================================
+  // LOAD DATA
+  // ===========================================================
+  async function loadBriefings() {
+    document.getElementById('briefings-grid').innerHTML =
+      '<div class="loading"><div class="spinner"></div>Carregando briefings...</div>';
+    try {
+      allBriefings = await supabaseFetch('briefings?order=score.desc&limit=200');
+      applyBriefingFilters();
+      updateLastUpdate();
+    } catch (e) {
+      showError(e.message);
+    }
+  }
+
+  async function loadCreators() {
+    document.getElementById('creators-grid').innerHTML =
+      '<div class="loading"><div class="spinner"></div>Carregando creators...</div>';
+    try {
+      allCreators = await supabaseFetch('creators_summary?order=afinidade_media.desc&limit=100');
+      applyCreatorFilters();
+    } catch (e) {
+      showError(e.message);
+    }
+  }
+
+  function applyCreatorFilters() {
+    const scoreMin = parseInt(document.getElementById('filter-creators-score').value) || 0;
+    const blacklistMode = document.getElementById('filter-creators-blacklist').value;
+
+    let filtered = allCreators.filter(c => {
+      if (c.afinidade_media < scoreMin) return false;
+      if (blacklistMode === 'hide' && c.tem_blacklist_sugerida) return false;
+      if (blacklistMode === 'only' && !c.tem_blacklist_sugerida) return false;
+      return true;
+    });
+
+    document.getElementById('creators-grid').innerHTML =
+      filtered.length === 0
+        ? '<div class="empty"><h3>Nenhum creator encontrado</h3></div>'
+        : filtered.map(renderCreatorCard).join('');
+  }
+
+  async function loadTrends() {
+    document.getElementById('trends-grid').innerHTML =
+      '<div class="loading"><div class="spinner"></div>Carregando trends...</div>';
+    try {
+      // Agrega enriched_videos por cluster_key
+      const minCount = parseInt(document.getElementById('filter-trends-count').value) || 3;
+      const data = await supabaseFetch('enriched_videos?select=cluster_key,formato_narrativo,score_afinidade,potencial_replicavel&cluster_key=not.is.null&limit=500');
+
+      const clusters = {};
+      data.forEach(v => {
+        if (!clusters[v.cluster_key]) {
+          clusters[v.cluster_key] = {
+            cluster_key: v.cluster_key,
+            formato_narrativo: v.formato_narrativo,
+            scores: [], replicaveis: [], video_count: 0
+          };
+        }
+        clusters[v.cluster_key].video_count++;
+        clusters[v.cluster_key].scores.push(v.score_afinidade);
+        clusters[v.cluster_key].replicaveis.push(v.potencial_replicavel);
+      });
+
+      const trends = Object.values(clusters)
+        .filter(c => c.video_count >= minCount)
+        .map(c => ({
+          ...c,
+          score_medio: c.scores.reduce((a,b) => a+b, 0) / c.scores.length,
+          replicavel_medio: c.replicaveis.reduce((a,b) => a+b, 0) / c.replicaveis.length
+        }))
+        .sort((a, b) => b.video_count - a.video_count);
+
+      document.getElementById('trends-grid').innerHTML =
+        trends.length === 0
+          ? '<div class="empty"><h3>Nenhuma trend identificada ainda</h3><p>Trends aparecem quando 3+ vídeos compartilham o mesmo formato narrativo em 72h.</p></div>'
+          : trends.map(renderTrendCard).join('');
+    } catch (e) {
+      showError(e.message);
+    }
+  }
+
+  // ===========================================================
+  // UI HELPERS
+  // ===========================================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function formatDate(iso) {
+    if (!iso) return '--';
+    return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+  }
+  function showError(msg) {
+    document.getElementById('error-container').innerHTML =
+      `<div class="error-banner">Erro carregando dados: ${escapeHtml(msg)}<br><small>Confira que SUPABASE_URL e SUPABASE_ANON_KEY estão configurados, e que as policies de RLS permitem leitura pela chave anon.</small></div>`;
+  }
+  function updateLastUpdate() {
+    document.getElementById('last-update').textContent =
+      new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // ===========================================================
+  // EVENTS
+  // ===========================================================
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+      const target = tab.dataset.tab;
+      document.getElementById(`tab-${target}`).style.display = 'block';
+      if (target === 'creators' && allCreators.length === 0) loadCreators();
+      if (target === 'trends') loadTrends();
+    });
+  });
+
+  ['filter-territorio', 'filter-pilar', 'filter-lata', 'filter-status', 'filter-score']
+    .forEach(id => document.getElementById(id).addEventListener('change', applyBriefingFilters));
+
+  document.getElementById('btn-clear-filters').addEventListener('click', () => {
+    document.getElementById('filter-territorio').value = '';
+    document.getElementById('filter-pilar').value = '';
+    document.getElementById('filter-lata').value = '';
+    document.getElementById('filter-status').value = '';
+    document.getElementById('filter-score').value = '60';
+    applyBriefingFilters();
+  });
+
+  document.getElementById('filter-creators-score').addEventListener('change', applyCreatorFilters);
+  document.getElementById('filter-creators-blacklist').addEventListener('change', applyCreatorFilters);
+  document.getElementById('filter-trends-count').addEventListener('change', loadTrends);
+
+  // Modal handlers via event delegation
+  document.addEventListener('click', (e) => {
+    if (e.target.dataset.action === 'open') {
+      const id = e.target.dataset.id;
+      const briefing = allBriefings.find(b => b.id === id);
+      if (briefing) {
+        document.getElementById('modal-content').innerHTML = renderModal(briefing);
+        document.getElementById('modal').classList.add('open');
+      }
+    }
+    if (e.target.dataset.action === 'close' || e.target.id === 'modal') {
+      document.getElementById('modal').classList.remove('open');
+    }
+  });
+
+  // Boot
+  loadBriefings();
+</script>
+
+</body>
+</html>
