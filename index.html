@@ -449,6 +449,20 @@
   let allCreators = [];
 
   // ===========================================================
+  // HELPERS DE PARSE DEFENSIVO
+  // ===========================================================
+  // ideias_ativacao pode vir como array (correto) ou como string JSON (bug histórico).
+  // Sempre normaliza pra array antes de usar.
+  function parseIdeias(b) {
+    const ideias = b.ideias_ativacao;
+    if (Array.isArray(ideias)) return ideias;
+    if (typeof ideias === 'string') {
+      try { return JSON.parse(ideias) || []; } catch { return []; }
+    }
+    return [];
+  }
+
+  // ===========================================================
   // RENDER BRIEFINGS
   // ===========================================================
   function renderBriefingCard(b) {
@@ -486,7 +500,7 @@
   }
 
   function renderModal(b) {
-    const ideias = (b.ideias_ativacao || []).map(i => {
+    const ideias = parseIdeias(b).map(i => {
       const riscoClass = `meta-risco-${i.nivel_risco || 'baixo'}`;
       const lataLabel = i.usa_lata
         ? '<span class="meta-lata">Com lata</span>'
@@ -638,7 +652,7 @@
   function renderStats(briefings) {
     const total = briefings.length;
     const high = briefings.filter(b => b.score >= 85).length;
-    const comLata = briefings.filter(b => (b.ideias_ativacao || []).some(i => i.usa_lata)).length;
+    const comLata = briefings.filter(b => parseIdeias(b).some(i => i.usa_lata)).length;
     const pctLata = total > 0 ? Math.round((comLata / total) * 100) : 0;
     const novos = briefings.filter(b => b.status === 'novo').length;
 
