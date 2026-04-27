@@ -356,7 +356,7 @@
       </div>
       <div class="filter-group">
         <label>Score mínimo</label>
-        <input type="number" id="filter-score" min="0" max="100" placeholder="60" value="60">
+        <input type="number" id="filter-score" min="0" max="100" placeholder="0" value="0">
       </div>
       <button class="filter-clear" id="btn-clear-filters">Limpar</button>
     </div>
@@ -711,9 +711,9 @@
     document.getElementById('trends-grid').innerHTML =
       '<div class="loading"><div class="spinner"></div>Carregando trends...</div>';
     try {
-      // Agrega enriched_videos por cluster_key
+      // Agrega briefings por cluster_key (Fase 1: enriched_videos não está sendo populado)
       const minCount = parseInt(document.getElementById('filter-trends-count').value) || 3;
-      const data = await supabaseFetch('enriched_videos?select=cluster_key,formato_narrativo,score_afinidade,potencial_replicavel&cluster_key=not.is.null&limit=500');
+      const data = await supabaseFetch('briefings?select=cluster_key,formato_narrativo,score,potencial_replicavel&cluster_key=not.is.null&limit=500');
 
       const clusters = {};
       data.forEach(v => {
@@ -725,16 +725,16 @@
           };
         }
         clusters[v.cluster_key].video_count++;
-        clusters[v.cluster_key].scores.push(v.score_afinidade);
-        clusters[v.cluster_key].replicaveis.push(v.potencial_replicavel);
+        clusters[v.cluster_key].scores.push(v.score);
+        if (v.potencial_replicavel != null) clusters[v.cluster_key].replicaveis.push(v.potencial_replicavel);
       });
 
       const trends = Object.values(clusters)
         .filter(c => c.video_count >= minCount)
         .map(c => ({
           ...c,
-          score_medio: c.scores.reduce((a,b) => a+b, 0) / c.scores.length,
-          replicavel_medio: c.replicaveis.reduce((a,b) => a+b, 0) / c.replicaveis.length
+          score_medio: c.scores.length > 0 ? c.scores.reduce((a,b) => a+b, 0) / c.scores.length : 0,
+          replicavel_medio: c.replicaveis.length > 0 ? c.replicaveis.reduce((a,b) => a+b, 0) / c.replicaveis.length : 0
         }))
         .sort((a, b) => b.video_count - a.video_count);
 
@@ -792,7 +792,7 @@
     document.getElementById('filter-pilar').value = '';
     document.getElementById('filter-lata').value = '';
     document.getElementById('filter-status').value = '';
-    document.getElementById('filter-score').value = '60';
+    document.getElementById('filter-score').value = '0';
     applyBriefingFilters();
   });
 
