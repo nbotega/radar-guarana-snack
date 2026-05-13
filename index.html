@@ -145,6 +145,14 @@
   .card-score.score-mid { background: var(--neutro-700); }
   .card-title { font-size: 16px; font-weight: 700; line-height: 1.35; color: var(--neutro-900); }
 
+  .card-metrics {
+    display: flex; gap: 14px;
+    font-size: 12px; font-weight: 600;
+    color: var(--neutro-500);
+    padding: 4px 0;
+  }
+  .card-metrics span { display: inline-flex; align-items: center; gap: 4px; }
+
   .tags { display: flex; flex-wrap: wrap; gap: 6px; }
   .tag { font-size: 11px; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
   .tag-territorio { background: rgba(0, 107, 63, 0.1); color: var(--verde-guarana); }
@@ -333,17 +341,6 @@
         </select>
       </div>
       <div class="filter-group">
-        <label>Lata Hero</label>
-        <select id="filter-lata">
-          <option value="">Todas</option>
-          <option value="1958">1958</option>
-          <option value="1962">1962</option>
-          <option value="1970">1970</option>
-          <option value="1994">1994</option>
-          <option value="2002">2002</option>
-        </select>
-      </div>
-      <div class="filter-group">
         <label>Status</label>
         <select id="filter-status">
           <option value="">Todos</option>
@@ -357,6 +354,16 @@
       <div class="filter-group">
         <label>Score mínimo</label>
         <input type="number" id="filter-score" min="0" max="100" placeholder="0" value="0">
+      </div>
+      <div class="filter-group">
+        <label>Ordenar por</label>
+        <select id="filter-ordem">
+          <option value="score">Score (maior primeiro)</option>
+          <option value="comment_count">Comentários (mais comentado)</option>
+          <option value="view_count">Views (mais visto)</option>
+          <option value="views_per_hour">Velocidade (views/hora)</option>
+          <option value="recente">Mais recente</option>
+        </select>
       </div>
       <button class="filter-clear" id="btn-clear-filters">Limpar</button>
     </div>
@@ -472,11 +479,16 @@
     const pilares = (b.pilar_match || []).map(p =>
       `<span class="tag tag-pilar">${p.replace('_', ' ')}</span>`
     ).join('');
-    const lata = b.lata_hero_sugerida
-      ? `<span class="tag tag-lata">Lata ${b.lata_hero_sugerida}</span>`
-      : '';
     const scoreClass = b.score >= 85 ? 'score-high' : b.score >= 60 ? '' : 'score-mid';
     const status = b.status || 'novo';
+
+    const metrics = `
+      <div class="card-metrics">
+        <span title="Comentários">💬 ${formatNumber(b.comment_count)}</span>
+        <span title="Views">👁 ${formatNumber(b.view_count)}</span>
+        <span title="Velocidade">⚡ ${formatNumber(b.views_per_hour)}/h</span>
+      </div>
+    `;
 
     return `
       <article class="card" data-id="${b.id}">
@@ -490,7 +502,8 @@
           <div class="card-score ${scoreClass}">${b.score}</div>
         </div>
         <h3 class="card-title">${escapeHtml(b.titulo || 'Briefing')}</h3>
-        <div class="tags">${lata}${territorios}${pilares}</div>
+        <div class="tags">${territorios}${pilares}</div>
+        ${metrics}
         <p class="card-justificativa">${escapeHtml(b.justificativa || '')}</p>
         <div class="card-actions">
           <button class="btn btn-primary" data-action="open" data-id="${b.id}">Ver ideias e alertas</button>
@@ -502,19 +515,11 @@
   function renderModal(b) {
     const ideias = parseIdeias(b).map(i => {
       const riscoClass = `meta-risco-${i.nivel_risco || 'baixo'}`;
-      const lataLabel = i.usa_lata
-        ? '<span class="meta-lata">Com lata</span>'
-        : '<span class="meta-no-lata">Sem lata</span>';
-      const sl = i.justificativa_sem_lata
-        ? `<p class="ideia-desc" style="margin-top:6px;font-style:italic;">Por que não usa lata: ${escapeHtml(i.justificativa_sem_lata)}</p>`
-        : '';
       return `
-        <div class="ideia ${i.usa_lata ? '' : 'no-lata'}">
+        <div class="ideia">
           <div class="ideia-titulo">${escapeHtml(i.titulo || '')}</div>
           <div class="ideia-desc">${escapeHtml(i.descricao || '')}</div>
-          ${sl}
           <div class="ideia-meta">
-            ${lataLabel}
             <span class="${riscoClass}">Risco ${i.nivel_risco || 'baixo'}</span>
           </div>
         </div>
@@ -538,12 +543,20 @@
       </div>
 
       <div class="modal-section">
-        <h3>Score · Território · Pilar · Lata</h3>
+        <h3>Score · Território · Pilar</h3>
         <div class="tags" style="margin-top:6px;">
           <span class="card-score ${b.score >= 85 ? 'score-high' : ''}" style="display:inline-block;">${b.score}/100</span>
-          ${b.lata_hero_sugerida ? `<span class="tag tag-lata">Lata ${b.lata_hero_sugerida}</span>` : ''}
           ${(b.territorio_match || []).map(t => `<span class="tag tag-territorio">${t} · ${TERRITORIO_LABELS[t]}</span>`).join('')}
           ${(b.pilar_match || []).map(p => `<span class="tag tag-pilar">${p.replace('_', ' ')}</span>`).join('')}
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h3>Métricas do vídeo</h3>
+        <div class="card-metrics" style="font-size:14px;">
+          <span title="Comentários">💬 ${formatNumber(b.comment_count)} comentários</span>
+          <span title="Views">👁 ${formatNumber(b.view_count)} views</span>
+          <span title="Velocidade">⚡ ${formatNumber(b.views_per_hour)} views/hora</span>
         </div>
       </div>
 
@@ -628,17 +641,26 @@
   function applyBriefingFilters() {
     const territorio = document.getElementById('filter-territorio').value;
     const pilar = document.getElementById('filter-pilar').value;
-    const lata = document.getElementById('filter-lata').value;
     const status = document.getElementById('filter-status').value;
     const scoreMin = parseInt(document.getElementById('filter-score').value) || 0;
+    const ordem = document.getElementById('filter-ordem').value;
 
     let filtered = allBriefings.filter(b => {
       if (b.score < scoreMin) return false;
       if (territorio && !(b.territorio_match || []).includes(territorio)) return false;
       if (pilar && !(b.pilar_match || []).includes(pilar)) return false;
-      if (lata && b.lata_hero_sugerida !== lata) return false;
       if (status && b.status !== status) return false;
       return true;
+    });
+
+    // Ordenação
+    filtered.sort((a, b) => {
+      if (ordem === 'recente') {
+        return new Date(b.criado_em || 0) - new Date(a.criado_em || 0);
+      }
+      const va = Number(a[ordem]) || 0;
+      const vb = Number(b[ordem]) || 0;
+      return vb - va;
     });
 
     document.getElementById('briefings-grid').innerHTML =
@@ -652,14 +674,17 @@
   function renderStats(briefings) {
     const total = briefings.length;
     const high = briefings.filter(b => b.score >= 85).length;
-    const comLata = briefings.filter(b => parseIdeias(b).some(i => i.usa_lata)).length;
-    const pctLata = total > 0 ? Math.round((comLata / total) * 100) : 0;
     const novos = briefings.filter(b => b.status === 'novo').length;
+    const totalComments = briefings.reduce((s, b) => s + (Number(b.comment_count) || 0), 0);
+    const scoreMedio = total > 0
+      ? Math.round(briefings.reduce((s, b) => s + (Number(b.score) || 0), 0) / total)
+      : 0;
 
     document.getElementById('stats-briefings').innerHTML = `
       <div class="stat"><div class="stat-label">Total</div><div class="stat-value">${total}</div></div>
       <div class="stat"><div class="stat-label">Score ≥ 85</div><div class="stat-value">${high}</div></div>
-      <div class="stat"><div class="stat-label">Com lata em cena</div><div class="stat-value">${pctLata}%</div></div>
+      <div class="stat"><div class="stat-label">Score médio</div><div class="stat-value">${scoreMedio}</div></div>
+      <div class="stat"><div class="stat-label">Comentários totais</div><div class="stat-value">${formatNumber(totalComments)}</div></div>
       <div class="stat"><div class="stat-label">Novos pra revisar</div><div class="stat-value">${novos}</div></div>
     `;
   }
@@ -671,7 +696,7 @@
     document.getElementById('briefings-grid').innerHTML =
       '<div class="loading"><div class="spinner"></div>Carregando briefings...</div>';
     try {
-      allBriefings = await supabaseFetch('briefings?order=score.desc&limit=200');
+      allBriefings = await supabaseFetch('briefings?select=*&order=score.desc&limit=500');
       applyBriefingFilters();
       updateLastUpdate();
     } catch (e) {
@@ -760,6 +785,12 @@
     if (!iso) return '--';
     return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
   }
+  function formatNumber(n) {
+    n = Number(n) || 0;
+    if (n >= 1_000_000) return (n / 1_000_000).toFixed(1).replace('.0', '') + 'M';
+    if (n >= 1_000) return (n / 1_000).toFixed(1).replace('.0', '') + 'k';
+    return String(n);
+  }
   function showError(msg) {
     document.getElementById('error-container').innerHTML =
       `<div class="error-banner">Erro carregando dados: ${escapeHtml(msg)}<br><small>Confira que SUPABASE_URL e SUPABASE_ANON_KEY estão configurados, e que as policies de RLS permitem leitura pela chave anon.</small></div>`;
@@ -784,15 +815,15 @@
     });
   });
 
-  ['filter-territorio', 'filter-pilar', 'filter-lata', 'filter-status', 'filter-score']
+  ['filter-territorio', 'filter-pilar', 'filter-status', 'filter-score', 'filter-ordem']
     .forEach(id => document.getElementById(id).addEventListener('change', applyBriefingFilters));
 
   document.getElementById('btn-clear-filters').addEventListener('click', () => {
     document.getElementById('filter-territorio').value = '';
     document.getElementById('filter-pilar').value = '';
-    document.getElementById('filter-lata').value = '';
     document.getElementById('filter-status').value = '';
     document.getElementById('filter-score').value = '0';
+    document.getElementById('filter-ordem').value = 'score';
     applyBriefingFilters();
   });
 
